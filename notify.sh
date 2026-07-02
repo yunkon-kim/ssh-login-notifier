@@ -124,17 +124,20 @@ if [ "$SHOULD_NOTIFY" = true ]; then
     # Get location information (optional, requires internet)
     LOCATION="Unknown"
     if command -v curl &> /dev/null && command -v python3 &> /dev/null; then
-        LOCATION=$(curl -s "https://ipapi.co/$IP/json/" 2>/dev/null | \
+        LOCATION=$(curl -s "http://ip-api.com/json/$IP?fields=status,message,city,country" 2>/dev/null | \
                    python3 -c "
 import sys, json
 try:
     data = json.load(sys.stdin)
-    city = data.get('city', '')
-    country = data.get('country_name', '')
-    if city and country:
-        print(f'{city}, {country}')
-    elif country:
-        print(country)
+    if data.get('status') == 'success':
+        city = data.get('city', '')
+        country = data.get('country', '')
+        if city and country:
+            print(f'{city}, {country}')
+        elif country:
+            print(country)
+        else:
+            print('Unknown')
     else:
         print('Unknown')
 except:

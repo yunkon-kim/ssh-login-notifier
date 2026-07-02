@@ -23,7 +23,7 @@ A security monitoring tool that automatically sends Slack notifications when som
 1. **PAM Hook**: Adds `pam_exec.so` module to `/etc/pam.d/sshd`
 2. **Session Info Collection**: Extracts IP from `$SSH_CLIENT` environment variable
 3. **IP Validation**: Uses Python's `ipaddress` module for CIDR-based whitelist checking
-4. **Geolocation Lookup**: Queries ipapi.co API for geographic location
+4. **Geolocation Lookup**: Queries ip-api.com API for geographic location (free, no API key required)
 5. **Slack Notification**: Sends JSON message via Webhook
 6. **Logging**: Records all login attempts to file
 
