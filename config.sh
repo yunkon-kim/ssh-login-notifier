@@ -7,7 +7,7 @@ SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 # Notification mode
 # "all" - Notify on all successful SSH logins (distinguishes trusted vs untrusted)
 # "untrusted_only" - Only notify for untrusted IPs (recommended)
-NOTIFY_MODE="untrusted_only"
+NOTIFY_MODE="all"
 
 # Whitelisted IP ranges (CIDR notation)
 # Only used when NOTIFY_MODE="untrusted_only"

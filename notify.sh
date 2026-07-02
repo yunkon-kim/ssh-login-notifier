@@ -24,36 +24,25 @@ ip_in_cidr() {
     local ip=$1
     local cidr=$2
     
-    # Debug log
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - ip_in_cidr: ip=[$ip] cidr=[$cidr]" >> "$LOG_FILE" 2>/dev/null
-    
     # Use ipcalc if available, otherwise use Python
     if command -v ipcalc &> /dev/null; then
         ipcalc -c "$ip" "$cidr" &> /dev/null
-        local result=$?
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - ip_in_cidr: using ipcalc, result=$result" >> "$LOG_FILE" 2>/dev/null
-        return $result
+        return $?
     elif command -v python3 &> /dev/null; then
-        local python_output
-        python_output=$(python3 -c "
+        python3 -c "
 import ipaddress
 import sys
 try:
-    ip_addr = ipaddress.ip_address('$ip')
-    network = ipaddress.ip_network('$cidr', strict=False)
-    result = ip_addr in network
-    print(f'DEBUG: ip={ip_addr}, network={network}, in_network={result}', file=sys.stderr)
-    sys.exit(0 if result else 1)
-except Exception as e:
-    print(f'ERROR: {e}', file=sys.stderr)
+    if ipaddress.ip_address('$ip') in ipaddress.ip_network('$cidr', strict=False):
+        sys.exit(0)
+    else:
+        sys.exit(1)
+except:
     sys.exit(1)
-" 2>&1)
-        local result=$?
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - ip_in_cidr: using python3, result=$result, output=[$python_output]" >> "$LOG_FILE" 2>/dev/null
-        return $result
+"
+        return $?
     else
         # Fallback: cannot check, assume not in range
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - ip_in_cidr: no tool available" >> "$LOG_FILE" 2>/dev/null
         return 1
     fi
 }
