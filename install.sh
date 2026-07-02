@@ -76,12 +76,14 @@ echo "Copying files..."
 cp "$SCRIPT_DIR/config.sh" "$INSTALL_DIR/"
 cp "$SCRIPT_DIR/notify.sh" "$INSTALL_DIR/"
 cp "$SCRIPT_DIR/slack_message.json" "$INSTALL_DIR/"
+cp "$SCRIPT_DIR/uninstall.sh" "$INSTALL_DIR/"
 
 # Set proper permissions
 chmod 755 "$INSTALL_DIR"
 chmod 644 "$INSTALL_DIR/config.sh"
 chmod 755 "$INSTALL_DIR/notify.sh"
 chmod 644 "$INSTALL_DIR/slack_message.json"
+chmod 755 "$INSTALL_DIR/uninstall.sh"
 
 echo "✓ Files copied and permissions set"
 echo ""

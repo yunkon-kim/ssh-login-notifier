@@ -3,6 +3,12 @@
 # SSH Login Notifier Script
 # This script sends Slack notifications when SSH login occurs
 
+# Only run on session open (login), not on session close (logout/exit)
+# PAM_TYPE is set by PAM: "open_session" for login, "close_session" for logout
+if [ "$PAM_TYPE" != "open_session" ]; then
+    exit 0
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Load configuration
