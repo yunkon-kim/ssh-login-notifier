@@ -349,11 +349,13 @@ grep "1.2.3.4" /var/log/ssh-login-notifier.log
 ### Untrusted Only Mode (Recommended)
 
 **Untrusted IP** (notification sent):
+
 ```
 ⚠️ Untrusted IP ip-172-31-19-69 - ubuntu from 129.254.75.2 (Seoul, South Korea)
 ```
 
 **Trusted IP** (no notification):
+
 ```
 (No notification)
 ```
@@ -361,11 +363,13 @@ grep "1.2.3.4" /var/log/ssh-login-notifier.log
 ### All Mode
 
 **Untrusted IP**:
+
 ```
 ⚠️ Untrusted IP ip-172-31-19-69 - ubuntu from 129.254.75.2 (Seoul, South Korea)
 ```
 
 **Trusted IP**:
+
 ```
 ✅ Logged in ip-172-31-19-69 - ubuntu from 203.0.113.50 (Seoul, South Korea)
 ```
