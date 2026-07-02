@@ -55,10 +55,31 @@ is_whitelisted() {
 }
 
 # Get login information
-SSH_CLIENT_STR=($SSH_CLIENT)
-IP=${SSH_CLIENT_STR[0]:-"unknown"}
+# PAM provides these environment variables:
+# - PAM_USER: the username
+# - PAM_RHOST: the remote host (IP address)
+# - SSH_CLIENT: format "IP PORT DEST_PORT" (if available)
+
+# Try to get IP from SSH_CLIENT first, fall back to PAM_RHOST
+if [ -n "$SSH_CLIENT" ]; then
+    SSH_CLIENT_STR=($SSH_CLIENT)
+    IP=${SSH_CLIENT_STR[0]}
+elif [ -n "$PAM_RHOST" ]; then
+    IP=$PAM_RHOST
+else
+    IP="unknown"
+fi
+
+# Try to get user from PAM_USER first, fall back to USER
+if [ -n "$PAM_USER" ]; then
+    USER=$PAM_USER
+elif [ -n "$USER" ]; then
+    USER=$USER
+else
+    USER="unknown"
+fi
+
 HOST=$(hostname)
-USER=${USER:-"unknown"}
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S %Z")
 
 # Log the login attempt
