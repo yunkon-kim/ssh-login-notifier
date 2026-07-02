@@ -11,7 +11,16 @@
 #
 # Note: remote-install.sh is ignored by git to protect your credentials
 
+set -e
+
 cd /tmp
+
+# Remove existing directory if present
+if [ -d "ssh-login-notifier" ]; then
+    rm -rf ssh-login-notifier
+fi
+
+# Clone the repository
 git clone https://github.com/yunkon-kim/ssh-login-notifier.git
 cd ssh-login-notifier
 
