@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# SSH Login Notifier - Remote Installation Script Template
+# 
+# This script is used to install SSH Login Notifier on remote servers via SSH.
+# 
+# Usage:
+#   1. Copy this template: cp remote-install.sh.template remote-install.sh
+#   2. Edit remote-install.sh with your actual Slack Webhook URL and IP whitelist
+#   3. Run: ssh user@remote-server 'bash -s' < remote-install.sh
+#
+# Note: remote-install.sh is ignored by git to protect your credentials
+
+cd /tmp
+git clone https://github.com/yunkon-kim/ssh-login-notifier.git
+cd ssh-login-notifier
+
+cat > config.sh << 'EOF'
+#!/bin/bash
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+NOTIFY_MODE="whitelist"
+WHITELISTED_IPS=(
+    "203.0.113.0/24"      # Example: Office network
+    "198.51.100.0/24"     # Example: VPN network
+)
+INSTALL_DIR="/opt/ssh-login-notifier"
+LOG_FILE="/var/log/ssh-login-notifier.log"
+EOF
+
+sudo bash install.sh
