@@ -1,14 +1,9 @@
 {
-  "text": "🔓 SSH Login Alert: *$HOST*",
+  "text": "$TITLE *$HOST*",
   "attachments": [
     {
-      "mrkdwn_in": [
-        "text",
-        "fields"
-      ],
+      "mrkdwn_in": ["fields"],
       "color": "$COLOR",
-      "title": "$TITLE",
-      "text": "SSH login detected on *$HOST*",
       "fields": [
         {
           "title": "User",
@@ -16,28 +11,22 @@
           "short": true
         },
         {
-          "title": "IP Address",
+          "title": "IP",
           "value": "<https://ipapi.co/$IP|$IP>",
-          "short": true
-        },
-        {
-          "title": "Hostname",
-          "value": "`$HOST`",
-          "short": true
-        },
-        {
-          "title": "Timestamp",
-          "value": "$TIMESTAMP",
           "short": true
         },
         {
           "title": "Location",
           "value": "$LOCATION",
-          "short": false
+          "short": true
+        },
+        {
+          "title": "Time",
+          "value": "$TIMESTAMP",
+          "short": true
         }
       ],
-      "footer": "SSH Login Notifier",
-      "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png"
+      "footer": "SSH Login Notifier"
     }
   ]
 }

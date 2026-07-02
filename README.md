@@ -349,14 +349,13 @@ grep "1.2.3.4" /var/log/ssh-login-notifier.log
 ### Non-Whitelisted IP Access
 
 ```
-🔓 SSH Login Alert: server-name
+🔓 SSH Login: server-name
 ⚠️ SSH Login from Non-Whitelisted IP
 
 User: ubuntu
-IP Address: 1.2.3.4
-Hostname: server-name
-Timestamp: 2026-07-02 14:30:45 KST
+IP: 1.2.3.4
 Location: Seoul, South Korea
+Time: 2026-07-02 14:30:45 KST
 ```
 
 ---
