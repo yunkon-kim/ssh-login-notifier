@@ -1,32 +1,3 @@
 {
-  "text": "$TITLE *$HOST*",
-  "attachments": [
-    {
-      "mrkdwn_in": ["fields"],
-      "color": "$COLOR",
-      "fields": [
-        {
-          "title": "User",
-          "value": "`$USER`",
-          "short": true
-        },
-        {
-          "title": "IP",
-          "value": "<https://ipapi.co/$IP|$IP>",
-          "short": true
-        },
-        {
-          "title": "Location",
-          "value": "$LOCATION",
-          "short": true
-        },
-        {
-          "title": "Time",
-          "value": "$TIMESTAMP",
-          "short": true
-        }
-      ],
-      "footer": "SSH Login Notifier"
-    }
-  ]
+  "text": "$STATUS *$HOST* - `$USER` from `$IP` ($LOCATION)"
 }

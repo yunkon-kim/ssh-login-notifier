@@ -152,8 +152,8 @@ echo "Log file: $LOG_FILE"
 echo ""
 echo "Notification mode: $NOTIFY_MODE"
 
-if [ "$NOTIFY_MODE" = "whitelist" ]; then
-    echo "Whitelisted IPs:"
+if [ "$NOTIFY_MODE" = "untrusted_only" ]; then
+    echo "Whitelisted IPs (trusted):"
     for ip in "${WHITELISTED_IPS[@]}"; do
         echo "  - $ip"
     done

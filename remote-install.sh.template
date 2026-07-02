@@ -27,7 +27,7 @@ cd ssh-login-notifier
 cat > config.sh << 'EOF'
 #!/bin/bash
 SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
-NOTIFY_MODE="whitelist"
+NOTIFY_MODE="untrusted_only"
 WHITELISTED_IPS=(
     "203.0.113.0/24"      # Example: Office network
     "198.51.100.0/24"     # Example: VPN network

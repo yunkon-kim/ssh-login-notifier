@@ -88,21 +88,34 @@ fi
 HOST=$(hostname)
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S %Z")
 
-# Log the login attempt
-echo "$(date "+%Y-%m-%d %H:%M:%S") - SSH login: user=$USER ip=$IP host=$HOST" >> "$LOG_FILE" 2>/dev/null
+# Check if IP is in whitelist
+IS_WHITELISTED=false
+if is_whitelisted "$IP"; then
+    IS_WHITELISTED=true
+fi
+
+# Log the login attempt with whitelist status
+echo "$(date "+%Y-%m-%d %H:%M:%S") - SSH login: user=$USER ip=$IP host=$HOST whitelisted=$IS_WHITELISTED" >> "$LOG_FILE" 2>/dev/null
 
 # Check if we should send notification based on mode
 SHOULD_NOTIFY=false
 
 if [ "$NOTIFY_MODE" = "all" ]; then
+    # In 'all' mode, always notify but distinguish trusted vs untrusted
     SHOULD_NOTIFY=true
-    COLOR="#36a64f"  # Green
-    TITLE="✅ SSH Login Detected"
-elif [ "$NOTIFY_MODE" = "whitelist" ]; then
-    if ! is_whitelisted "$IP"; then
+    if [ "$IS_WHITELISTED" = true ]; then
+        COLOR="#36a64f"  # Green
+        STATUS="✅ Logged in"
+    else
+        COLOR="#ff9900"  # Orange/Warning
+        STATUS="⚠️ Untrusted IP"
+    fi
+elif [ "$NOTIFY_MODE" = "untrusted_only" ]; then
+    # In 'untrusted_only' mode, only notify for untrusted IPs
+    if [ "$IS_WHITELISTED" = false ]; then
         SHOULD_NOTIFY=true
         COLOR="#ff9900"  # Orange/Warning
-        TITLE="⚠️  SSH Login from Non-Whitelisted IP"
+        STATUS="⚠️ Untrusted IP"
     fi
 fi
 
@@ -110,9 +123,28 @@ fi
 if [ "$SHOULD_NOTIFY" = true ]; then
     # Get location information (optional, requires internet)
     LOCATION="Unknown"
-    if command -v curl &> /dev/null; then
+    if command -v curl &> /dev/null && command -v python3 &> /dev/null; then
         LOCATION=$(curl -s "https://ipapi.co/$IP/json/" 2>/dev/null | \
-                   python3 -c "import sys, json; data=json.load(sys.stdin); print(f\"{data.get('city', 'Unknown')}, {data.get('region', '')}, {data.get('country_name', 'Unknown')}\")" 2>/dev/null || echo "Unknown")
+                   python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin)
+    city = data.get('city', '')
+    country = data.get('country_name', '')
+    if city and country:
+        print(f'{city}, {country}')
+    elif country:
+        print(country)
+    else:
+        print('Unknown')
+except:
+    print('Unknown')
+" 2>/dev/null)
+    fi
+    
+    # Fallback if location is empty
+    if [ -z "$LOCATION" ] || [ "$LOCATION" = "null" ]; then
+        LOCATION="Unknown"
     fi
     
     # Load message template
@@ -127,7 +159,7 @@ if [ "$SHOULD_NOTIFY" = true ]; then
                 -e "s|\$TIMESTAMP|$TIMESTAMP|g" \
                 -e "s|\$LOCATION|$LOCATION|g" \
                 -e "s|\$COLOR|$COLOR|g" \
-                -e "s|\$TITLE|$TITLE|g")
+                -e "s|\$STATUS|$STATUS|g")
         
         # Send to Slack
         curl --silent --output /dev/null \

@@ -91,7 +91,7 @@ vi config.sh  # or nano, vim, etc.
 SLACK_WEBHOOK_URL="https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXX"
 
 # 2. Select notification mode
-NOTIFY_MODE="whitelist"  # "all" or "whitelist"
+NOTIFY_MODE="untrusted_only"  # "all" or "untrusted_only"
 
 # 3. Whitelist IP ranges (CIDR notation)
 WHITELISTED_IPS=(
@@ -103,8 +103,8 @@ WHITELISTED_IPS=(
 
 **Notification modes:**
 
-- `all`: Notify on all SSH logins
-- `whitelist`: Notify only for IPs not in whitelist (recommended)
+- `all`: Notify on all SSH logins (distinguishes trusted vs untrusted IPs)
+- `untrusted_only`: Notify only for untrusted IPs (recommended)
 
 ### Step 3: Run Installation
 
@@ -150,7 +150,7 @@ cd ssh-login-notifier
 cat > config.sh << 'EOF'
 #!/bin/bash
 SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
-NOTIFY_MODE="whitelist"
+NOTIFY_MODE="untrusted_only"
 WHITELISTED_IPS=(
     "203.0.113.0/24"
     "198.51.100.0/24"
@@ -259,7 +259,7 @@ cd ssh-login-notifier
 cat > config.sh << 'EOF'
 #!/bin/bash
 SLACK_WEBHOOK_URL="${slack_webhook_url}"
-NOTIFY_MODE="whitelist"
+NOTIFY_MODE="untrusted_only"
 WHITELISTED_IPS=(
 %{ for ip in jsondecode(whitelisted_ips) ~}
     "${ip}"
@@ -346,16 +346,28 @@ grep "1.2.3.4" /var/log/ssh-login-notifier.log
 
 ## Notification Message Example
 
-### Non-Whitelisted IP Access
+### Untrusted Only Mode (Recommended)
 
+**Untrusted IP** (notification sent):
 ```
-🔓 SSH Login: server-name
-⚠️ SSH Login from Non-Whitelisted IP
+⚠️ Untrusted IP ip-172-31-19-69 - ubuntu from 129.254.75.2 (Seoul, South Korea)
+```
 
-User: ubuntu
-IP: 1.2.3.4
-Location: Seoul, South Korea
-Time: 2026-07-02 14:30:45 KST
+**Trusted IP** (no notification):
+```
+(No notification)
+```
+
+### All Mode
+
+**Untrusted IP**:
+```
+⚠️ Untrusted IP ip-172-31-19-69 - ubuntu from 129.254.75.2 (Seoul, South Korea)
+```
+
+**Trusted IP**:
+```
+✅ Logged in ip-172-31-19-69 - ubuntu from 203.0.113.50 (Seoul, South Korea)
 ```
 
 ---
