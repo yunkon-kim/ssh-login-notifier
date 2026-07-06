@@ -24,10 +24,14 @@ ip_in_cidr() {
     local ip=$1
     local cidr=$2
     
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: ip_in_cidr checking $ip against $cidr" >> "$LOG_FILE" 2>/dev/null
+    
     # Use ipcalc if available, otherwise use Python
     if command -v ipcalc &> /dev/null; then
         ipcalc -c "$ip" "$cidr" &> /dev/null
-        return $?
+        local result=$?
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: ipcalc result: $result" >> "$LOG_FILE" 2>/dev/null
+        return $result
     elif command -v python3 &> /dev/null; then
         python3 -c "
 import ipaddress
@@ -40,9 +44,12 @@ try:
 except:
     sys.exit(1)
 "
-        return $?
+        local result=$?
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: python3 result: $result" >> "$LOG_FILE" 2>/dev/null
+        return $result
     else
         # Fallback: cannot check, assume not in range
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: No ipcalc or python3 available" >> "$LOG_FILE" 2>/dev/null
         return 1
     fi
 }
@@ -88,10 +95,17 @@ fi
 HOST=$(hostname)
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S %Z")
 
+# Debug: Log whitelist configuration
+echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: WHITELISTED_IPS array contents: ${WHITELISTED_IPS[@]}" >> "$LOG_FILE" 2>/dev/null
+echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: Number of whitelist entries: ${#WHITELISTED_IPS[@]}" >> "$LOG_FILE" 2>/dev/null
+
 # Check if IP is in whitelist
 IS_WHITELISTED=false
 if is_whitelisted "$IP"; then
     IS_WHITELISTED=true
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: is_whitelisted returned TRUE for $IP" >> "$LOG_FILE" 2>/dev/null
+else
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: is_whitelisted returned FALSE for $IP" >> "$LOG_FILE" 2>/dev/null
 fi
 
 # Log the login attempt with whitelist status
