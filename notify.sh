@@ -33,18 +33,26 @@ ip_in_cidr() {
         echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: ipcalc result: $result" >> "$LOG_FILE" 2>/dev/null
         return $result
     elif command -v python3 &> /dev/null; then
-        python3 -c "
+        python_output=$(python3 2>&1 <<PYEOF
 import ipaddress
 import sys
 try:
-    if ipaddress.ip_address('$ip') in ipaddress.ip_network('$cidr', strict=False):
+    ip = '$ip'
+    cidr = '$cidr'
+    print(f'Python: Checking {ip} in {cidr}', file=sys.stderr)
+    result = ipaddress.ip_address(ip) in ipaddress.ip_network(cidr, strict=False)
+    print(f'Python: Result = {result}', file=sys.stderr)
+    if result:
         sys.exit(0)
     else:
         sys.exit(1)
-except:
+except Exception as e:
+    print(f'Python: Error = {e}', file=sys.stderr)
     sys.exit(1)
-"
+PYEOF
+)
         local result=$?
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: python3 output: $python_output" >> "$LOG_FILE" 2>/dev/null
         echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: python3 result: $result" >> "$LOG_FILE" 2>/dev/null
         return $result
     else
