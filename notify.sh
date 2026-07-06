@@ -24,40 +24,28 @@ ip_in_cidr() {
     local ip=$1
     local cidr=$2
     
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: ip_in_cidr checking $ip against $cidr" >> "$LOG_FILE" 2>/dev/null
-    
     # Use ipcalc if available, otherwise use Python
     if command -v ipcalc &> /dev/null; then
         ipcalc -c "$ip" "$cidr" &> /dev/null
-        local result=$?
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: ipcalc result: $result" >> "$LOG_FILE" 2>/dev/null
-        return $result
+        return $?
     elif command -v python3 &> /dev/null; then
-        python_output=$(python3 2>&1 <<PYEOF
+        python3 2>&1 <<PYEOF >/dev/null
 import ipaddress
 import sys
 try:
     ip = '$ip'
     cidr = '$cidr'
-    print(f'Python: Checking {ip} in {cidr}', file=sys.stderr)
     result = ipaddress.ip_address(ip) in ipaddress.ip_network(cidr, strict=False)
-    print(f'Python: Result = {result}', file=sys.stderr)
     if result:
         sys.exit(0)
     else:
         sys.exit(1)
 except Exception as e:
-    print(f'Python: Error = {e}', file=sys.stderr)
     sys.exit(1)
 PYEOF
-)
-        local result=$?
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: python3 output: $python_output" >> "$LOG_FILE" 2>/dev/null
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: python3 result: $result" >> "$LOG_FILE" 2>/dev/null
-        return $result
+        return $?
     else
         # Fallback: cannot check, assume not in range
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: No ipcalc or python3 available" >> "$LOG_FILE" 2>/dev/null
         return 1
     fi
 }
@@ -103,17 +91,10 @@ fi
 HOST=$(hostname)
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S %Z")
 
-# Debug: Log whitelist configuration
-echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: WHITELISTED_IPS array contents: ${WHITELISTED_IPS[@]}" >> "$LOG_FILE" 2>/dev/null
-echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: Number of whitelist entries: ${#WHITELISTED_IPS[@]}" >> "$LOG_FILE" 2>/dev/null
-
 # Check if IP is in whitelist
 IS_WHITELISTED=false
 if is_whitelisted "$IP"; then
     IS_WHITELISTED=true
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: is_whitelisted returned TRUE for $IP" >> "$LOG_FILE" 2>/dev/null
-else
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - DEBUG: is_whitelisted returned FALSE for $IP" >> "$LOG_FILE" 2>/dev/null
 fi
 
 # Log the login attempt with whitelist status
