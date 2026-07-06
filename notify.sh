@@ -103,16 +103,16 @@ SHOULD_NOTIFY=false
 if [ "$NOTIFY_MODE" = "all" ]; then
     # In 'all' mode, always notify but distinguish trusted vs untrusted
     SHOULD_NOTIFY=true
-    if [ "$IS_WHITELISTED" = true ]; then
+    if [ "$IS_WHITELISTED" = "true" ]; then
         COLOR="#36a64f"  # Green
-        STATUS="✅ Logged in"
+        STATUS="✅ Trusted IP"
     else
         COLOR="#ff9900"  # Orange/Warning
         STATUS="⚠️ Untrusted IP"
     fi
 elif [ "$NOTIFY_MODE" = "untrusted_only" ]; then
     # In 'untrusted_only' mode, only notify for untrusted IPs
-    if [ "$IS_WHITELISTED" = false ]; then
+    if [ "$IS_WHITELISTED" = "false" ]; then
         SHOULD_NOTIFY=true
         COLOR="#ff9900"  # Orange/Warning
         STATUS="⚠️ Untrusted IP"
@@ -122,7 +122,7 @@ fi
 # Send notification if required
 if [ "$SHOULD_NOTIFY" = true ]; then
     # Get location information (optional, requires internet)
-    LOCATION="Unknown"
+    LOCATION="unknown location"
     if command -v curl &> /dev/null && command -v python3 &> /dev/null; then
         LOCATION=$(curl -s "http://ip-api.com/json/$IP?fields=status,message,city,country" 2>/dev/null | \
                    python3 -c "
@@ -147,7 +147,7 @@ except:
     
     # Fallback if location is empty
     if [ -z "$LOCATION" ] || [ "$LOCATION" = "null" ]; then
-        LOCATION="Unknown"
+        LOCATION="unknown location"
     fi
     
     # Load message template

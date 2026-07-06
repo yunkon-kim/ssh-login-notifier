@@ -10,7 +10,7 @@ SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 NOTIFY_MODE="all"
 
 # Whitelisted IP ranges (CIDR notation)
-# Only used when NOTIFY_MODE="untrusted_only"
+# Used in both modes: "all" mode shows green for trusted IPs, "untrusted_only" mode only notifies for non-whitelisted IPs
 # Add your trusted IP ranges here
 WHITELISTED_IPS=(
     "203.0.113.0/24"      # Example: Office network
